@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+# PODNAME: lastfm_export
+# ABSTRACT: data exporter for last.fm
+
+use DBI;
+use Getopt::Long qw(:config pass_through);
+use LastFM::Export;
+use Term::ProgressBar;
+
+my $dsn;
+GetOptions(
+    'dsn=s' => \$dsn,
+);
+die "--dsn is required" unless $dsn;
+
+my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1, AutoCommit => 0 });
+$dbh->do(<<'');
+CREATE TABLE `tracks` (
+    artist varchar(1024) NOT NULL,
+    album varchar(1024) DEFAULT NULL,
+    name varchar(1024) NOT NULL,
+    timestamp integer(11) NOT NULL
+);
+
+my $exporter = LastFM::Export->new_with_options;
+my $progress = Term::ProgressBar->new({
+    count => $exporter->track_count,
+    ETA   => 'linear',
+});
+
+my $sth = $dbh->prepare(
+    'INSERT INTO tracks (artist, album, name, timestamp) VALUES (?, ?, ?, ?)'
+);
+
+my $count = 1;
+my $s = $exporter->tracks;
+while (my $block = $s->next) {
+    for my $item (@$block) {
+        $sth->execute(
+            $item->{artist}{'#text'},
+            $item->{album}{'#text'},
+            $item->{name},
+            $item->{date}{uts},
+        );
+        $progress->update($count++);
+    }
+    $dbh->commit;
+    sleep 1;
+}
