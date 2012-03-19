@@ -17,19 +17,33 @@ GetOptions(
 die "--dsn is required" unless $dsn;
 
 my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1, AutoCommit => 0 });
-$dbh->do(<<'');
-CREATE TABLE `tracks` (
-    artist varchar(1024) NOT NULL,
-    album varchar(1024) DEFAULT NULL,
-    name varchar(1024) NOT NULL,
-    timestamp integer(11) NOT NULL
-);
+my $from = 0;
+if (!$dbh->tables(undef, undef, 'tracks')) {
+    $dbh->do(<<'');
+    CREATE TABLE `tracks` (
+        artist varchar(1024) NOT NULL,
+        album varchar(1024) DEFAULT NULL,
+        name varchar(1024) NOT NULL,
+        timestamp integer(11) NOT NULL
+    );
+
+}
+else {
+    ($from) = $dbh->selectrow_array('SELECT timestamp FROM tracks ORDER BY timestamp DESC LIMIT 1');
+}
 
 my $exporter = LastFM::Export->new_with_options;
+
+my $track_count = $exporter->track_count(from => $from);
+if (!$track_count) {
+    $dbh->disconnect;
+    exit(0);
+}
+
 my $progress;
 if (!$quiet) {
     $progress = Term::ProgressBar->new({
-        count => $exporter->track_count,
+        count => $track_count,
         ETA   => 'linear',
     });
 }
@@ -39,7 +53,7 @@ my $sth = $dbh->prepare(
 );
 
 my $count = 1;
-my $s = $exporter->tracks;
+my $s = $exporter->tracks(from => $from);
 while (my $block = $s->next) {
     for my $item (@$block) {
         $sth->execute(
@@ -53,3 +67,5 @@ while (my $block = $s->next) {
     $dbh->commit;
     sleep 1;
 }
+
+$dbh->disconnect;
