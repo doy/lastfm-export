@@ -9,9 +9,10 @@ use Getopt::Long qw(:config pass_through);
 use LastFM::Export;
 use Term::ProgressBar;
 
-my $dsn;
+my ($dsn, $quiet);
 GetOptions(
     'dsn=s' => \$dsn,
+    'quiet' => \$quiet,
 );
 die "--dsn is required" unless $dsn;
 
@@ -25,10 +26,13 @@ CREATE TABLE `tracks` (
 );
 
 my $exporter = LastFM::Export->new_with_options;
-my $progress = Term::ProgressBar->new({
-    count => $exporter->track_count,
-    ETA   => 'linear',
-});
+my $progress;
+if (!$quiet) {
+    $progress = Term::ProgressBar->new({
+        count => $exporter->track_count,
+        ETA   => 'linear',
+    });
+}
 
 my $sth = $dbh->prepare(
     'INSERT INTO tracks (artist, album, name, timestamp) VALUES (?, ?, ?, ?)'
@@ -44,7 +48,7 @@ while (my $block = $s->next) {
             $item->{name},
             $item->{date}{uts},
         );
-        $progress->update($count++);
+        $progress->update($count++) unless $quiet;
     }
     $dbh->commit;
     sleep 1;
