@@ -5,8 +5,6 @@ use Moose;
 use Data::Stream::Bulk::Callback;
 use Net::LastFM;
 
-with 'MooseX::Getopt';
-
 =head1 SYNOPSIS
 
   use LastFM::Export;

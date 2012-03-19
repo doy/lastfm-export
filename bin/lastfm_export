@@ -9,12 +9,14 @@ use Getopt::Long qw(:config pass_through);
 use LastFM::Export;
 use Term::ProgressBar;
 
-my ($dsn, $quiet);
+my ($dsn, $user, $quiet);
 GetOptions(
-    'dsn=s' => \$dsn,
-    'quiet' => \$quiet,
+    'dsn=s'  => \$dsn,
+    'user=s' => \$user,
+    'quiet'  => \$quiet,
 );
 die "--dsn is required" unless $dsn;
+die "--user is required" unless $user;
 
 my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1, AutoCommit => 0 });
 my $from = 0;
@@ -32,7 +34,7 @@ else {
     ($from) = $dbh->selectrow_array('SELECT timestamp FROM tracks ORDER BY timestamp DESC LIMIT 1');
 }
 
-my $exporter = LastFM::Export->new_with_options;
+my $exporter = LastFM::Export->new(user => $user);
 
 my $track_count = $exporter->track_count(from => $from);
 if (!$track_count) {
