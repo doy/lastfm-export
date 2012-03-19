@@ -34,12 +34,13 @@ has lastfm => (
 
 sub track_count {
     my $self = shift;
+    my (%params) = @_;
 
-    return $self->lastfm->request(
-        method => 'user.getRecentTracks',
-        user   => $self->user,
-        limit  => 1,
-    )->{recenttracks}{'@attr'}{total};
+    $params{method} = 'user.getRecentTracks';
+    $params{user}   = $self->user;
+    $params{limit}  = 1;
+
+    return $self->lastfm->request(%params)->{recenttracks}{'@attr'}{total};
 }
 
 sub tracks {
