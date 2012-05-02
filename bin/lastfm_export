@@ -58,13 +58,20 @@ my $count = 1;
 my $s = $exporter->tracks(from => $from);
 while (my $block = $s->next) {
     for my $item (@$block) {
-        $sth->execute(
-            $item->{artist}{'#text'},
-            $item->{album}{'#text'},
-            $item->{name},
-            $item->{date}{uts},
-        );
-        $progress->update($count++) unless $quiet;
+        if ($item->{date}{uts}) {
+            $sth->execute(
+                $item->{artist}{'#text'},
+                $item->{album}{'#text'},
+                $item->{name},
+                $item->{date}{uts},
+            );
+            $progress->update($count++) unless $quiet;
+        }
+        else {
+            $progress->message("skipping currently playing song: "
+                             . "$item->{artist}{'#text'} - $item->{name}")
+                unless $quiet;
+        }
     }
     $dbh->commit;
     sleep 1;

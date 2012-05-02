@@ -1,6 +1,7 @@
 Revision history for LastFM-Export
 
 {{$NEXT}}
+      - Make the update process not fail when a song is currently playing.
 
 0.01  2012-03-19
       - Initial release
