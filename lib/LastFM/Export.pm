@@ -122,9 +122,8 @@ no Moose;
 
 No known bugs.
 
-Please report any bugs through RT: email
-C<bug-lastfm-export at rt.cpan.org>, or browse to
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LastFM-Export>.
+Please report any bugs to GitHub Issues at
+L<https://github.com/doy/lastfm-export/issues>.
 
 =head1 SEE ALSO
 
@@ -142,21 +141,21 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/LastFM-Export>
+L<https://metacpan.org/release/LastFM-Export>
 
-=item * CPAN Ratings
+=item * Github
 
-L<http://cpanratings.perl.org/d/LastFM-Export>
+L<https://github.com/doy/lastfm-export>
 
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=LastFM-Export>
 
-=item * Search CPAN
+=item * CPAN Ratings
 
-L<http://search.cpan.org/dist/LastFM-Export>
+L<http://cpanratings.perl.org/d/LastFM-Export>
 
 =back
 
