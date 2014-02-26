@@ -1,6 +1,8 @@
 Revision history for LastFM-Export
 
 {{$NEXT}}
+
+0.03  2014-02-25
       - stop using #!/usr/bin/env perl in installed scripts
 
 0.02  2012-05-01
